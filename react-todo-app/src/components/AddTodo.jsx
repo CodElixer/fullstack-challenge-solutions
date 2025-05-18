@@ -3,10 +3,27 @@ import React, { useState } from 'react';
 export default function AddTodo({ onAdd }) {
   const [text, setText] = useState('');
 
-  const handleAdd = () => {
+  const handleAdd = async () => {
     if (!text.trim()) return;
-    onAdd(text);
-    setText('');
+
+    const newTodo = {
+      todo: text,
+      completed: false,
+      userId: 5,
+    };
+
+    try {
+      const res = await fetch('https://dummyjson.com/todos/add', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newTodo),
+      });
+      const data = await res.json();
+      onAdd({ id: data.id, text: data.todo, completed: data.completed });
+      setText('');
+    } catch (error) {
+      console.error('Error adding todo:', error);
+    }
   };
 
   return (
